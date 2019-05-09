@@ -60,8 +60,9 @@ PyObject *pylist_from_carr(int argc, const char *argv[]) {
 
 PyObject *get_url_from_args(int argc, const char *argv[]) {
     PyObject *url = NULL;
+    PyObject *arglist = NULL;
 
-    PyObject *arglist = pylist_from_carr(argc, argv);
+    arglist = pylist_from_carr(argc, argv);
     Py_ssize_t size = PySequence_Size(arglist);
     if(size < 2) {
         PyErr_SetString(PyExc_ValueError, "Error: Must supply a URL");
