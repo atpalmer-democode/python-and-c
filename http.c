@@ -19,14 +19,14 @@ int raise_for_status(PyObject *response) {
 
 PyObject *requests_get(PyObject *self, PyObject *url) {
     PyObject *response_text = NULL;
-    PyObject *get_args = NULL;
     PyObject *get_result = NULL;
 
     PyObject *requests_dict = PyModule_GetDict(self);
     PyObject *get_meth = PyMapping_GetItemString(requests_dict, "get");
 
-    get_args = PyTuple_Pack(1, url);
+    PyObject *get_args = PyTuple_Pack(1, url);
     get_result = PyEval_CallObject(get_meth, get_args);
+    Py_DECREF(get_args);
 
     if(get_result == NULL) {
         goto end;
@@ -40,7 +40,6 @@ PyObject *requests_get(PyObject *self, PyObject *url) {
 
 end:
     Py_XDECREF(get_result);
-    Py_XDECREF(get_args);
     Py_XDECREF(get_meth);
     return response_text;
 }
