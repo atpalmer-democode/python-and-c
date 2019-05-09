@@ -4,45 +4,45 @@
 int raise_for_status(PyObject *response) {
     PyObject *meth = PyObject_GetAttrString(response, "raise_for_status");
 
-    PyObject *empty_args = PyTuple_Pack(0);
-    PyObject *meth_result = PyEval_CallObject(meth, empty_args);
-    Py_DECREF(empty_args);
+    PyObject *args = PyTuple_Pack(0);
+    PyObject *returned = PyEval_CallObject(meth, args);
+    Py_DECREF(args);
 
-    if(meth_result == NULL) {
+    if(returned == NULL) {
         return 0;
     }
 
-    Py_DECREF(meth_result);
+    Py_DECREF(returned);
     return 1;
 }
 
 
 PyObject *requests_get(PyObject *self, PyObject *url) {
-    PyObject *response_text = NULL;
-    PyObject *get_result = NULL;
+    PyObject *resp_text = NULL;
+    PyObject *resp_obj = NULL;
     PyObject *get_meth = NULL;
 
-    PyObject *requests_dict = PyModule_GetDict(self);
-    get_meth = PyMapping_GetItemString(requests_dict, "get");
+    PyObject *req_dict = PyModule_GetDict(self);
+    get_meth = PyMapping_GetItemString(req_dict, "get");
 
     PyObject *get_args = PyTuple_Pack(1, url);
-    get_result = PyEval_CallObject(get_meth, get_args);
+    resp_obj = PyEval_CallObject(get_meth, get_args);
     Py_DECREF(get_args);
 
-    if(get_result == NULL) {
+    if(resp_obj == NULL) {
         goto end;
     }
 
-    if(!raise_for_status(get_result)) {
+    if(!raise_for_status(resp_obj)) {
         goto end;
     }
 
-    response_text = PyObject_GetAttrString(get_result, "text");
+    resp_text = PyObject_GetAttrString(resp_obj, "text");
 
 end:
-    Py_XDECREF(get_result);
+    Py_XDECREF(resp_obj);
     Py_XDECREF(get_meth);
-    return response_text;
+    return resp_text;
 }
 
 
@@ -78,8 +78,8 @@ end:
 
 
 int main(int argc, const char *argv[]) {
-    PyObject *requests = NULL;
-    PyObject *text = NULL;
+    PyObject *reqmod = NULL;
+    PyObject *resp = NULL;
     PyObject *url = NULL;
 
     Py_Initialize();
@@ -89,22 +89,22 @@ int main(int argc, const char *argv[]) {
         goto end;
     }
 
-    requests = PyImport_ImportModule("requests");
-    if(requests == NULL) {
+    reqmod = PyImport_ImportModule("requests");
+    if(reqmod == NULL) {
         goto end;
     }
 
-    text = requests_get(requests, url);
-    if(text == NULL) {
+    resp = requests_get(reqmod, url);
+    if(resp == NULL) {
         goto end;
     }
 
-    PyObject_Print(text, stdout, Py_PRINT_RAW);
+    PyObject_Print(resp, stdout, Py_PRINT_RAW);
 
 end:
     Py_XDECREF(url);
-    Py_XDECREF(text);
-    Py_XDECREF(requests);
+    Py_XDECREF(resp);
+    Py_XDECREF(reqmod);
     int exit_code = EXIT_SUCCESS;
     if(PyErr_Occurred()) {
         PyErr_Print();
