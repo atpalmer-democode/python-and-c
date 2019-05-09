@@ -1,18 +1,6 @@
 #include <Python.h>
 
 
-PyObject *pylist_from_carr(int argc, const char *argv[]) {
-    PyObject *list = PyList_New(argc);
-
-    for(int i = 0; i < argc; ++i) {
-        PyObject *item = PyUnicode_FromString(argv[i]);
-        PyList_SetItem(list, i, item);
-    }
-
-    return list;
-}
-
-
 PyObject *requests_get(PyObject *self, PyObject *url) {
     PyObject *response_text = NULL;
     PyObject *get_args = NULL;
@@ -34,6 +22,18 @@ end:
     Py_XDECREF(get_args);
     Py_XDECREF(get_meth);
     return response_text;
+}
+
+
+PyObject *pylist_from_carr(int argc, const char *argv[]) {
+    PyObject *list = PyList_New(argc);
+
+    for(int i = 0; i < argc; ++i) {
+        PyObject *item = PyUnicode_FromString(argv[i]);
+        PyList_SetItem(list, i, item);
+    }
+
+    return list;
 }
 
 
