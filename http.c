@@ -1,6 +1,22 @@
 #include <Python.h>
 
 
+int raise_for_status(PyObject *response) {
+    PyObject *meth = PyObject_GetAttrString(response, "raise_for_status");
+
+    PyObject *empty_args = PyTuple_Pack(0);
+    PyObject *meth_result = PyEval_CallObject(meth, empty_args);
+    Py_DECREF(empty_args);
+
+    if(meth_result == NULL) {
+        return 0;
+    }
+
+    Py_DECREF(meth_result);
+    return 1;
+}
+
+
 PyObject *requests_get(PyObject *self, PyObject *url) {
     PyObject *response_text = NULL;
     PyObject *get_args = NULL;
@@ -11,7 +27,12 @@ PyObject *requests_get(PyObject *self, PyObject *url) {
 
     get_args = PyTuple_Pack(1, url);
     get_result = PyEval_CallObject(get_meth, get_args);
+
     if(get_result == NULL) {
+        goto end;
+    }
+
+    if(!raise_for_status(get_result)) {
         goto end;
     }
 
