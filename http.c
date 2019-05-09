@@ -8,9 +8,8 @@ int raise_for_status(PyObject *response) {
     PyObject *returned = PyEval_CallObject(meth, args);
     Py_DECREF(args);
 
-    if(returned == NULL) {
+    if(!returned)
         return 0;
-    }
 
     Py_DECREF(returned);
     return 1;
@@ -29,13 +28,10 @@ PyObject *requests_get(PyObject *self, PyObject *url) {
     resp_obj = PyEval_CallObject(get_meth, get_args);
     Py_DECREF(get_args);
 
-    if(resp_obj == NULL) {
+    if(!resp_obj)
         goto end;
-    }
-
-    if(!raise_for_status(resp_obj)) {
+    if(!raise_for_status(resp_obj))
         goto end;
-    }
 
     resp_text = PyObject_GetAttrString(resp_obj, "text");
 
@@ -85,19 +81,14 @@ int main(int argc, const char *argv[]) {
     Py_Initialize();
 
     url = get_url_from_args(argc, argv);
-    if(url == NULL) {
+    if(!url)
         goto end;
-    }
-
     reqmod = PyImport_ImportModule("requests");
-    if(reqmod == NULL) {
+    if(!reqmod)
         goto end;
-    }
-
     resp = requests_get(reqmod, url);
-    if(resp == NULL) {
+    if(!resp)
         goto end;
-    }
 
     PyObject_Print(resp, stdout, Py_PRINT_RAW);
 
